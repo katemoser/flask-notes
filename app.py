@@ -8,11 +8,12 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///notes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 
 connect_db(app)
 db.create_all()
 
-app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
+
 
 
 @app.get("/")
@@ -48,3 +49,8 @@ def register():
     else:
         return render_template("register.html", form = form)
 
+@app.get("/secret")
+def secret():
+    """Placeholder"""
+
+    return render_template("secret.html")
