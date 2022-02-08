@@ -25,7 +25,10 @@ def homepage():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    """Register user"""
+    """Register user:
+        if form validates, create new user, log in as said user, redirect to secret
+        if does not validate, render registration form
+    """
 
     form = RegisterForm()
 
@@ -48,6 +51,30 @@ def register():
         return redirect("/secret")
     else:
         return render_template("register.html", form = form)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """LOGIN USER:
+        if form validates, login user and redirect to secret
+        if does not validate, render login form
+    """
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.username.data
+
+        user = User.authenticate(username, password)
+
+        if user:
+            session["username"] = user.username
+            return redirect('/secret')
+            
+    return render_template("login.html", form = form)
+
+
+
 
 @app.get("/secret")
 def secret():
