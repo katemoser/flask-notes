@@ -30,3 +30,19 @@ class RegisterForm(FlaskForm):
         "Last Name",
         validators=[InputRequired(), Length(max=30)]
     )
+
+class LoginForm(FlaskForm):
+    """User Login"""
+
+    username = StringField(
+        "Username", 
+        validators=[InputRequired(), Length(max=20)]
+    )
+
+    password = PasswordField(
+        "Password",
+        validators=[InputRequired(), Length(min=8, max=20)]
+    )
+
+class CSRFProtectForm(FlaskForm):
+    """Form just for CSRF Protection"""
