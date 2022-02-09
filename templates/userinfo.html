@@ -11,4 +11,16 @@ USER INFO
 <p>Name: {{user.first_name}} {{user.last_name}}</p>
 <p>Email: {{user.email}}</p>
 
+<ul>
+    {% for note in user.notes %}
+    <li>
+        {{note.title}}
+        {{note.content}}
+    </li>
+    <br>
+
+    {%endfor%}
+
+</ul>
+
 {% endblock%}

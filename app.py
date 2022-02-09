@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, session, flash
 # from flask_debugtoolbar import DebugToolbarExtension
 
-from models import db, User, connect_db
-from forms import RegisterForm, LoginForm, CSRFProtectForm
+from models import db, User, Note, connect_db
+from forms import EditNoteForm, RegisterForm, LoginForm, CSRFProtectForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///notes'
@@ -102,3 +102,29 @@ def user_info(username):
     else:
         user = User.query.filter_by(username=username).one_or_none()
         return render_template("userinfo.html", user=user)
+
+
+
+#######################################
+
+@app.route("/notes/<note-id>/update", methods=["PATCH", "GET"])
+def editnote(note_id):
+    """edit note"""
+    note = Note.query.get_or_404(note_id)
+    form = EditNoteForm(note)
+
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+        note.title = title
+        note.content = content
+
+        db.session.commit()
+
+        return redirect(f"users/{note.owner}")
+
+
+    return render_template("editnote.html", form=form)
+
+    
