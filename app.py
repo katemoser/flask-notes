@@ -14,7 +14,7 @@ connect_db(app)
 db.create_all()
 
 
-
+# LOG IN/REGISTER ROUTES
 
 @app.get("/")
 def homepage():
@@ -26,7 +26,7 @@ def homepage():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     """Register user:
-        if form validates, create new user, log in as said user, redirect to secret
+        if form validates, create new user, log in as said user, redirect to userinfo
         if does not validate, render registration form
     """
 
@@ -41,21 +41,23 @@ def register():
         first_name = form.first_name.data
         last_name = form.last_name.data
 
-        new_user = User.register(username, password, email, first_name, last_name)
+        new_user = User.register(
+            username, password, email, first_name, last_name)
 
         db.session.add(new_user)
         db.session.commit()
 
         session["username"] = new_user.username
 
-        return redirect("/secret")
+        return redirect(f"/users/{new_user.usename}")
     else:
-        return render_template("register.html", form = form)
+        return render_template("register.html", form=form)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """LOGIN USER:
-        if form validates, login user and redirect to secret
+        if form validates, login user and redirect to userinfo
         if does not validate, render login form
     """
 
@@ -63,18 +65,17 @@ def login():
 
     if form.validate_on_submit():
         username = form.username.data
-        password = form.username.data
+        password = form.password.data
 
         user = User.authenticate(username, password)
-
         if user:
             session["username"] = user.username
-            return redirect('/secret')
-            
-    return render_template("login.html", form = form)
+            return redirect(f'/users/{user.username}')
+
+    return render_template("login.html", form=form)
 
 
-@app.post("/logout")
+@app.route("/logout", methods=["POST", "GET"])
 def logout():
     """Logs user out and redirects to homepage."""
 
@@ -83,20 +84,21 @@ def logout():
     if form.validate_on_submit():
         # Remove "username" if present, but no errors if it wasn't
         session.pop("username", None)
+        return redirect("/")
+    else:
+        return render_template("logout.html", form=form)
 
-    return redirect("/")
 
+@app.get("/users/<username>")
+def user_info(username):
+    """Displays user's info if logged in
+        redirects to home if not logged in as <username>
+    """
 
-
-
-@app.get("/secret")
-def secret():
-    """Placeholder"""
-
-    if "username" not in session:
+    if session["username"] != username:
         flash("You must be logged in to view!")
         return redirect("/")
 
     else:
-        return render_template("secret.html")
-    
+        user = User.query.filter_by(username=username).one_or_none()
+        return render_template("userinfo.html", user=user)

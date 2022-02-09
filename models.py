@@ -14,7 +14,10 @@ def connect_db(app):
 
 
 class User(db.Model):
-    """Class for user"""
+    """Class for user
+        contains information (username, password, email, first and last name)
+        also includes authentication and registration
+    """
 
     __tablename__ = "users"
 
@@ -72,6 +75,9 @@ class User(db.Model):
 
         user = cls.query.filter_by(username=username).one_or_none()
         if user and bcrypt.check_password_hash(user.password, password):
+            print("*************************************FOUND USER")
             return user
         else:
+            print("*************************************DID NOT FIND USER")
+
             return False
